@@ -1,0 +1,159 @@
+/* gpio-sim panel — bench-instrument aesthetic. Self-contained: system fonts only,
+   no external assets. The signature element is the output-pin glow (.dot.out.on). */
+
+:root {
+  --bg: #0b0e13;
+  --panel: #12161d;
+  --pcb: #0f3d2e;         /* dark green board */
+  --ink: #e6edf3;
+  --muted: #8b98a5;
+  --line: #232b36;
+  --gold: #d8a54a;        /* pin pads */
+  --accent: #34d399;
+  --out-glow: #7CFF6B;    /* the memorable colour: an output driven high */
+  --in-on: #38bdf8;
+  --pwr: #f0603a;
+  --gnd: #5b6672;
+  --focus: #ffd166;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 50% -200px, #16202b 0%, var(--bg) 60%);
+  color: var(--ink);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+/* ---- top bar ---- */
+.bar {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  padding: 16px 24px; border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #12161d, #0d1117);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand h1 { margin: 0; font-size: 20px; letter-spacing: .5px; }
+.sub { margin: 0; color: var(--muted); font-size: 12px; }
+.logo {
+  width: 34px; height: 34px; border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, var(--gold) 0 2px, transparent 2px 6px) 4px 4px/26px 4px no-repeat,
+    repeating-linear-gradient(90deg, var(--gold) 0 2px, transparent 2px 6px) 4px 26px/26px 4px no-repeat,
+    #1c2530;
+  border: 1px solid #2a3644;
+  box-shadow: inset 0 0 0 6px #12161d;
+}
+
+.meta { display: flex; gap: 22px; margin: 0; flex: 1; flex-wrap: wrap; }
+.meta div { display: flex; flex-direction: column; }
+.meta dt { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.meta dd { margin: 0; font-variant-numeric: tabular-nums; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.link-up { color: var(--accent); }
+.link-down { color: var(--pwr); }
+
+.reboot {
+  background: #1b2230; color: var(--ink); border: 1px solid #2c3a4a;
+  padding: 9px 16px; border-radius: 8px; font-size: 14px; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.reboot:hover { background: #232d3d; border-color: #3a4a5e; }
+.reboot:active { transform: translateY(1px); }
+
+/* ---- main ---- */
+main { max-width: 760px; margin: 0 auto; padding: 24px 16px 56px; }
+.hint { color: var(--muted); font-size: 13px; margin: 4px 2px 22px; }
+.hint strong { color: var(--ink); }
+kbd {
+  font-family: ui-monospace, Menlo, monospace; font-size: 11px;
+  background: #1b2230; border: 1px solid #2c3a4a; border-bottom-width: 2px;
+  border-radius: 4px; padding: 1px 5px;
+}
+code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--accent); }
+
+/* ---- the board ---- */
+.board { display: flex; justify-content: center; }
+.header-frame {
+  background: linear-gradient(160deg, #124534, var(--pcb));
+  border: 1px solid #1c5c45; border-radius: 14px;
+  padding: 18px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.5), inset 0 1px 0 #1e6b50;
+}
+.grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+}
+
+/* ---- a pin ---- */
+.pin {
+  display: flex; align-items: center; gap: 9px;
+  padding: 5px 8px; border-radius: 8px;
+  background: #0c231b; border: 1px solid transparent;
+  min-width: 0;
+}
+.pin.right { flex-direction: row-reverse; text-align: right; }
+.pin.interactive { cursor: pointer; }
+.pin.interactive:hover { background: #0e2a20; }
+.pin:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.phys {
+  font-family: ui-monospace, Menlo, monospace; font-size: 10px;
+  color: #6f8a7e; min-width: 16px; text-align: center;
+}
+.labels { min-width: 0; }
+.name {
+  font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.alt { font-size: 10px; color: #6f8a7e; white-space: nowrap; }
+
+/* the LED dot */
+.dot {
+  width: 14px; height: 14px; border-radius: 50%; flex: none;
+  background: #10251c; border: 1px solid #274a3b;
+  transition: box-shadow .18s ease, background .18s ease;
+}
+.dot.pwr { background: var(--pwr); border-color: #7a2a1a; }
+.dot.gnd { background: var(--gnd); border-color: #3b444e; }
+.dot.dim { background: #10251c; border-color: #1e3a2e; }
+
+/* outputs: glow when high — the signature */
+.dot.out.on {
+  background: var(--out-glow); border-color: #a6ffa0;
+  box-shadow: 0 0 6px var(--out-glow), 0 0 14px rgba(124,255,107,.7);
+}
+/* inputs: a cooler switch colour when high */
+.dot.in.on {
+  background: var(--in-on); border-color: #9bdcfb;
+  box-shadow: 0 0 5px var(--in-on), 0 0 12px rgba(56,189,248,.55);
+}
+
+.pin .name.pwr-t { color: #f0a08e; }
+.pin .name.gnd-t { color: var(--muted); }
+.pin.dim .name { color: #567; }
+.badge {
+  font-size: 9px; padding: 0 4px; border-radius: 4px; margin-left: 6px;
+  border: 1px solid #2c4a3c; color: #8fb3a4;
+}
+
+.legend {
+  display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center;
+  margin-top: 24px; color: var(--muted); font-size: 12px;
+}
+.legend .key { display: inline-flex; align-items: center; gap: 6px; }
+.legend .dot { width: 11px; height: 11px; }
+
+/* ---- responsive ---- */
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+  .pin.right { flex-direction: row; text-align: left; }
+  .meta { gap: 14px; }
+}
+
+/* ---- respect reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .dot.out.on, .dot.in.on { box-shadow: 0 0 0 2px currentColor inset; }
+}

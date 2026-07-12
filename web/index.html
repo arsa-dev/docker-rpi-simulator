@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gpio-sim · virtual GPIO bench</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <h1>gpio-sim</h1>
+      <p class="sub">virtual Raspberry&nbsp;Pi GPIO bench</p>
+    </div>
+  </div>
+  <dl class="meta">
+    <div><dt>board</dt><dd id="m-board">—</dd></div>
+    <div><dt>chip</dt><dd id="m-label">—</dd></div>
+    <div><dt>link</dt><dd id="m-link" class="link-down">connecting…</dd></div>
+  </dl>
+  <button id="reboot" class="reboot" type="button">Simulate reboot</button>
+</header>
+
+<main>
+  <p class="hint">
+    <strong>Output</strong> pins are driven by your code and glow when high — you watch them.
+    <strong>Input</strong> pins are yours to operate: click or press <kbd>Space</kbd> to toggle,
+    and any matching <code>edge</code> wakes a waiting <code>poll()</code>. Unexported pins are dim.
+  </p>
+
+  <section class="board" aria-label="40-pin GPIO header">
+    <div class="header-frame">
+      <div id="grid" class="grid" role="list"></div>
+    </div>
+  </section>
+
+  <section class="legend" aria-hidden="true">
+    <span class="key"><i class="dot out on"></i> output high</span>
+    <span class="key"><i class="dot out"></i> output low</span>
+    <span class="key"><i class="dot in on"></i> input high</span>
+    <span class="key"><i class="dot in"></i> input low</span>
+    <span class="key"><i class="dot pwr"></i> power</span>
+    <span class="key"><i class="dot gnd"></i> ground</span>
+    <span class="key"><i class="dot dim"></i> unexported</span>
+  </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>
