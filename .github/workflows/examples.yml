@@ -1,0 +1,24 @@
+name: Examples
+
+# The language-examples suite pulls Node, Python, and Go toolchains and builds
+# onoff's native addon, so it's kept off the PR path. Run it on demand or weekly.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays at 06:00 UTC
+
+jobs:
+  examples:
+    name: Language examples end-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure FUSE is available
+        run: sudo modprobe fuse || true
+      - name: Build examples image
+        run: docker build -f docker/Dockerfile.examples -t gpio-sim-examples .
+      - name: Run all language examples
+        run: >
+          docker run --rm
+          --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor=unconfined
+          gpio-sim-examples

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+# Keep PR CI fast: native unit tests + the core & web integration suites in a
+# container. The (slower) language-examples suite runs separately — see examples.yml.
+jobs:
+  unit:
+    name: Native unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: make test
+        run: make test
+
+  lint:
+    name: Lint (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: shellcheck scripts
+        run: shellcheck docker/entrypoint.sh tests/integration/*.sh examples/shell/*.sh
+
+  integration:
+    name: Core + web integration (FUSE)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure FUSE is available
+        run: sudo modprobe fuse || true
+      - name: Build dev image
+        run: docker build -f docker/Dockerfile.dev -t gpio-sim-dev .
+      - name: Run integration suites
+        run: >
+          docker run --rm
+          --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor=unconfined
+          gpio-sim-dev
