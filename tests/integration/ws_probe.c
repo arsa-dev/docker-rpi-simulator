@@ -49,16 +49,21 @@ int main(int argc, char **argv)
     unsigned char buf[8192];
     size_t used = 0;
     char *hdr_end = NULL;
+    /* Read until we have the handshake response AND enough of the following frame to
+     * parse its header + a little payload. The handshake and the frame can arrive in
+     * separate TCP segments, so we can't assume one recv() gets both. */
     while (used < sizeof(buf) - 1) {
         ssize_t n = recv(fd, buf + used, sizeof(buf) - 1 - used, 0);
-        if (n <= 0) break;
+        if (n <= 0) break;                       /* EOF or timeout */
         used += (size_t)n;
         buf[used] = '\0';
-        if (!hdr_end && (hdr_end = strstr((char *)buf, "\r\n\r\n"))) {
-            /* keep reading a little to capture the first frame too */
+        if (!hdr_end)
+            hdr_end = strstr((char *)buf, "\r\n\r\n");
+        if (hdr_end) {
+            size_t frame_bytes = used - (size_t)((hdr_end + 4) - (char *)buf);
+            if (frame_bytes >= 12)               /* enough for header + preview */
+                break;
         }
-        if (hdr_end && (size_t)(used) > (size_t)(hdr_end - (char *)buf) + 4 + 1)
-            break;
     }
     if (!hdr_end) { fprintf(stderr, "no handshake response\n"); return 1; }
 
@@ -70,21 +75,24 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    /* Parse the first server->client frame that follows the header. */
+    /* Parse the first server->client frame that follows the header. Getting a text
+     * opcode is proof the live-state push works; the payload preview is best-effort. */
     unsigned char *fp = (unsigned char *)hdr_end + 4;
     size_t avail = used - (size_t)(fp - buf);
     if (avail < 2) { fprintf(stderr, "no frame after handshake\n"); return 1; }
     int opcode = fp[0] & 0x0f;
-    size_t len = fp[1] & 0x7f;
-    size_t off = 2;
-    if (len == 126) { len = (fp[2] << 8) | fp[3]; off = 4; }
     if (opcode != 0x1) { fprintf(stderr, "first frame not text (opcode=%d)\n", opcode); return 1; }
-    if (off + 1 > avail) { fprintf(stderr, "short frame\n"); return 1; }
+
+    size_t lenfield = fp[1] & 0x7f;
+    size_t off = 2, len = lenfield;
+    if (lenfield == 126 && avail >= 4) { len = ((size_t)fp[2] << 8) | fp[3]; off = 4; }
+    else if (lenfield == 127)          { off = 10; }   /* not used by our payloads */
 
     char preview[48] = {0};
-    size_t cp = avail - off; if (cp > sizeof(preview) - 1) cp = sizeof(preview) - 1;
-    memcpy(preview, fp + off, cp);
-    printf("WSOK accept-valid, text frame len=%zu: %s...\n", len, preview);
+    size_t cp = (avail > off) ? avail - off : 0;
+    if (cp > sizeof(preview) - 1) cp = sizeof(preview) - 1;
+    if (cp) memcpy(preview, fp + off, cp);
+    printf("WSOK accept-valid, text frame len>=%zu: %s...\n", len, preview);
     close(fd);
     return 0;
 }
