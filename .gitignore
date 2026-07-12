@@ -1,0 +1,8 @@
+build/
+*.o
+*.a
+mnt/
+node_modules/
+examples/**/blink-button
+examples/c-epoll/blink-button
+examples/go/blink-button

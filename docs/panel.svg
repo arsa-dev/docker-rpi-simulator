@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" font-family="ui-monospace, Menlo, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16202b"/><stop offset="1" stop-color="#0b0e13"/>
+    </linearGradient>
+    <linearGradient id="pcb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#124534"/><stop offset="1" stop-color="#0f3d2e"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+
+  <rect width="760" height="470" rx="12" fill="url(#bg)"/>
+
+  <!-- top bar -->
+  <rect width="760" height="60" rx="12" fill="#0d1117"/>
+  <rect y="40" width="760" height="20" fill="#0d1117"/>
+  <rect x="18" y="16" width="28" height="28" rx="6" fill="#1c2530" stroke="#2a3644"/>
+  <g fill="#d8a54a"><rect x="22" y="20" width="20" height="2"/><rect x="22" y="38" width="20" height="2"/></g>
+  <text x="58" y="27" fill="#e6edf3" font-size="17" font-family="ui-sans-serif, system-ui">gpio-sim</text>
+  <text x="58" y="43" fill="#8b98a5" font-size="11" font-family="ui-sans-serif, system-ui">virtual Raspberry Pi GPIO bench</text>
+  <text x="300" y="26" fill="#8b98a5" font-size="10">BOARD</text><text x="300" y="41" fill="#e6edf3" font-size="12">pi4</text>
+  <text x="380" y="26" fill="#8b98a5" font-size="10">CHIP</text><text x="380" y="41" fill="#e6edf3" font-size="12">pinctrl-bcm2711</text>
+  <text x="540" y="26" fill="#8b98a5" font-size="10">LINK</text><text x="540" y="41" fill="#34d399" font-size="12">connected</text>
+  <rect x="632" y="14" width="112" height="32" rx="8" fill="#1b2230" stroke="#2c3a4a"/>
+  <text x="688" y="34" fill="#e6edf3" font-size="12" text-anchor="middle">Simulate reboot</text>
+
+  <!-- board -->
+  <rect x="196" y="84" width="368" height="352" rx="14" fill="url(#pcb)" stroke="#1c5c45"/>
+
+  <!-- pin rows: dot + label (left col) | phys | phys | (right col) label + dot -->
+  <g font-size="13">
+    <!-- row template repeated; y centers at 116 + i*38 -->
+
+    <!-- row 0: 3V3 | 5V -->
+    <circle cx="228" cy="116" r="7" fill="#f0603a"/><text x="244" y="120" fill="#f0a08e">3V3</text>
+    <text x="362" y="120" fill="#6f8a7e" text-anchor="end" font-size="10">1</text><text x="372" y="120" fill="#6f8a7e" font-size="10">2</text>
+    <text x="516" y="120" fill="#f0a08e" text-anchor="end">5V</text><circle cx="532" cy="116" r="7" fill="#f0603a"/>
+
+    <!-- row 1: GPIO2 in low | 5V -->
+    <circle cx="228" cy="154" r="7" fill="#10251c" stroke="#274a3b"/><text x="244" y="158" fill="#e6edf3">GPIO2</text>
+    <text x="362" y="158" fill="#6f8a7e" text-anchor="end" font-size="10">3</text><text x="372" y="158" fill="#6f8a7e" font-size="10">4</text>
+    <text x="516" y="158" fill="#f0a08e" text-anchor="end">5V</text><circle cx="532" cy="154" r="7" fill="#f0603a"/>
+
+    <!-- row 2: GPIO3 in low | GND -->
+    <circle cx="228" cy="192" r="7" fill="#10251c" stroke="#274a3b"/><text x="244" y="196" fill="#e6edf3">GPIO3</text>
+    <text x="362" y="196" fill="#6f8a7e" text-anchor="end" font-size="10">5</text><text x="372" y="196" fill="#6f8a7e" font-size="10">6</text>
+    <text x="516" y="196" fill="#8b98a5" text-anchor="end">GND</text><circle cx="532" cy="192" r="7" fill="#5b6672"/>
+
+    <!-- row 3: GPIO4 OUT HIGH (glow) | GPIO14 out low -->
+    <circle cx="228" cy="230" r="11" fill="#7CFF6B" filter="url(#glow)" opacity="0.6"/>
+    <circle cx="228" cy="230" r="7" fill="#7CFF6B" stroke="#a6ffa0"/><text x="244" y="234" fill="#e6edf3">GPIO4</text>
+    <text x="330" y="234" fill="#6f8a7e" font-size="10">out</text>
+    <text x="362" y="234" fill="#6f8a7e" text-anchor="end" font-size="10">7</text><text x="372" y="234" fill="#6f8a7e" font-size="10">8</text>
+    <text x="516" y="234" fill="#e6edf3" text-anchor="end">GPIO14</text><circle cx="532" cy="230" r="7" fill="#10251c" stroke="#274a3b"/>
+
+    <!-- row 4: GND | GPIO15 IN HIGH (blue) -->
+    <circle cx="228" cy="268" r="7" fill="#5b6672"/><text x="244" y="272" fill="#8b98a5">GND</text>
+    <text x="362" y="272" fill="#6f8a7e" text-anchor="end" font-size="10">9</text><text x="372" y="272" fill="#6f8a7e" font-size="10">10</text>
+    <text x="516" y="272" fill="#e6edf3" text-anchor="end">GPIO15</text>
+    <circle cx="532" cy="268" r="10" fill="#38bdf8" filter="url(#glow)" opacity="0.5"/>
+    <circle cx="532" cy="268" r="7" fill="#38bdf8" stroke="#9bdcfb"/>
+
+    <!-- row 5: GPIO17 OUT HIGH (glow) | GPIO18 in low -->
+    <circle cx="228" cy="306" r="11" fill="#7CFF6B" filter="url(#glow)" opacity="0.6"/>
+    <circle cx="228" cy="306" r="7" fill="#7CFF6B" stroke="#a6ffa0"/><text x="244" y="310" fill="#e6edf3">GPIO17</text>
+    <text x="330" y="310" fill="#6f8a7e" font-size="10">out</text>
+    <text x="362" y="310" fill="#6f8a7e" text-anchor="end" font-size="10">11</text><text x="372" y="310" fill="#6f8a7e" font-size="10">12</text>
+    <text x="516" y="310" fill="#e6edf3" text-anchor="end">GPIO18</text><circle cx="532" cy="306" r="7" fill="#10251c" stroke="#274a3b"/>
+
+    <!-- row 6: GPIO27 in low | GND -->
+    <circle cx="228" cy="344" r="7" fill="#10251c" stroke="#274a3b"/><text x="244" y="348" fill="#e6edf3">GPIO27</text>
+    <text x="330" y="348" fill="#6f8a7e" font-size="10">in ·rising</text>
+    <text x="362" y="348" fill="#6f8a7e" text-anchor="end" font-size="10">13</text><text x="372" y="348" fill="#6f8a7e" font-size="10">14</text>
+    <text x="516" y="348" fill="#8b98a5" text-anchor="end">GND</text><circle cx="532" cy="344" r="7" fill="#5b6672"/>
+
+    <!-- row 7: GPIO22 out low | GPIO23 IN HIGH (blue) -->
+    <circle cx="228" cy="382" r="7" fill="#10251c" stroke="#274a3b"/><text x="244" y="386" fill="#e6edf3">GPIO22</text>
+    <text x="362" y="386" fill="#6f8a7e" text-anchor="end" font-size="10">15</text><text x="372" y="386" fill="#6f8a7e" font-size="10">16</text>
+    <text x="516" y="386" fill="#e6edf3" text-anchor="end">GPIO23</text>
+    <circle cx="532" cy="382" r="10" fill="#38bdf8" filter="url(#glow)" opacity="0.5"/>
+    <circle cx="532" cy="382" r="7" fill="#38bdf8" stroke="#9bdcfb"/>
+  </g>
+
+  <text x="380" y="418" fill="#6f8a7e" font-size="10" text-anchor="middle">40-pin header (excerpt) · outputs glow when high · inputs are clickable switches</text>
+
+  <!-- legend -->
+  <g font-size="11" font-family="ui-sans-serif, system-ui">
+    <circle cx="196" cy="452" r="6" fill="#7CFF6B"/><text x="208" y="456" fill="#8b98a5">output high</text>
+    <circle cx="300" cy="452" r="6" fill="#38bdf8"/><text x="312" y="456" fill="#8b98a5">input high</text>
+    <circle cx="396" cy="452" r="6" fill="#f0603a"/><text x="408" y="456" fill="#8b98a5">power</text>
+    <circle cx="470" cy="452" r="6" fill="#5b6672"/><text x="482" y="456" fill="#8b98a5">ground</text>
+    <circle cx="548" cy="452" r="6" fill="#10251c" stroke="#274a3b"/><text x="560" y="456" fill="#8b98a5">low / unexported</text>
+  </g>
+</svg>
