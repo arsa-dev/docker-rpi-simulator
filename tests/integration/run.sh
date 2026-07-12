@@ -17,7 +17,7 @@ pass=0; fail=0
 ok()   { echo "  ok   - $1"; pass=$((pass+1)); }
 bad()  { echo "  FAIL - $1"; fail=$((fail+1)); }
 # assert_eq <desc> <expected> <actual>
-assert_eq() { [ "$2" = "$3" ] && ok "$1" || bad "$1 (expected '$2', got '$3')"; }
+assert_eq() { if [ "$2" = "$3" ]; then ok "$1"; else bad "$1 (expected '$2', got '$3')"; fi; }
 # assert_ok <desc> <cmd...>  — command must succeed
 assert_ok() { local d="$1"; shift; if "$@" >/dev/null 2>&1; then ok "$d"; else bad "$d"; fi; }
 # assert_fail <desc> <cmd...> — command must fail

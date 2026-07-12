@@ -17,7 +17,7 @@ BASE="http://127.0.0.1:$PORT"
 pass=0; fail=0
 ok()  { echo "  ok   - $1"; pass=$((pass+1)); }
 bad() { echo "  FAIL - $1"; fail=$((fail+1)); }
-assert_eq() { [ "$2" = "$3" ] && ok "$1" || bad "$1 (expected '$2', got '$3')"; }
+assert_eq() { if [ "$2" = "$3" ]; then ok "$1"; else bad "$1 (expected '$2', got '$3')"; fi; }
 
 cleanup() { [ -n "${DP:-}" ] && kill "$DP" 2>/dev/null; fusermount3 -u "$MOUNT" 2>/dev/null; }
 trap cleanup EXIT
