@@ -1,0 +1,35 @@
+# Dockerfile.examples — builds the simulator plus every language runtime, then runs
+# the examples end-to-end as integration tests (Milestone 5). Larger than the shipping
+# image on purpose: it carries node, python3, and go just to prove the examples run.
+#
+#   docker build -f docker/Dockerfile.examples -t gpio-sim-examples .
+#   docker run --rm --device /dev/fuse --cap-add SYS_ADMIN \
+#              --security-opt apparmor=unconfined gpio-sim-examples
+
+# ---- build the daemon + test tools ----
+FROM debian:bookworm-slim AS builder
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential pkg-config libfuse3-dev \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+COPY . /src
+RUN make daemon tools && strip build/gpio-sim
+
+# ---- runtime with language toolchains ----
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        fuse3 libfuse3-3 ca-certificates \
+        build-essential python3 nodejs npm golang-go \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "user_allow_other" >> /etc/fuse.conf
+
+WORKDIR /work
+COPY --from=builder /src /work
+
+# Compile the native example, install onoff (builds its epoll addon), build the Go one.
+ENV GOFLAGS=-mod=mod GOCACHE=/tmp/gocache
+RUN make -C examples/c-epoll \
+ && (cd examples/node-onoff && npm install --no-audit --no-fund --loglevel=error) \
+ && (cd examples/go && go build -o blink-button .)
+
+CMD ["bash", "tests/integration/run_examples.sh"]

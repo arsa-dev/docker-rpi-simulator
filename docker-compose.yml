@@ -1,0 +1,27 @@
+# One-command start:  docker compose up
+#
+# Grants only the FUSE capabilities the simulator needs — never `privileged: true`
+# (ADR 0001, decision #5). Verified on Linux and macOS Docker Desktop.
+services:
+  gpio-sim:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: ghcr.io/arsa-dev/docker-rpi-simulator:dev
+    container_name: gpio-sim
+
+    # --- the minimal FUSE grant (equivalent CLI flags) ---
+    devices:
+      - /dev/fuse                    # --device /dev/fuse
+    cap_add:
+      - SYS_ADMIN                    # --cap-add SYS_ADMIN  (mount syscalls)
+    security_opt:
+      - apparmor=unconfined          # --security-opt apparmor=unconfined
+
+    environment:
+      GPIO_BOARD: pi4                # classic | pi4 | pi5
+      GPIO_MOUNT_MODE: auto          # auto | overlay | plain
+      GPIO_LOG_LEVEL: info
+
+    ports:
+      - "8080:8080"                  # web panel (Milestone 4)

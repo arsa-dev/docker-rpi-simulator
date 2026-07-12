@@ -1,0 +1,27 @@
+# Dockerfile.dev — build + integration-test image for Milestone 2.
+#
+# This is a DEVELOPMENT image: it compiles the daemon and test tools and runs the
+# FUSE integration suite. The production multi-stage image, entrypoint, and the
+# overlay-over-/sys/class mount strategy arrive in Milestone 3 (docker/Dockerfile).
+#
+# Run the suite (needs FUSE access, never full --privileged):
+#   docker build -f docker/Dockerfile.dev -t gpio-sim-dev .
+#   docker run --rm --device /dev/fuse --cap-add SYS_ADMIN \
+#              --security-opt apparmor=unconfined gpio-sim-dev
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        pkg-config \
+        libfuse3-dev \
+        fuse3 \
+        curl \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work
+COPY . /work
+
+RUN make daemon tools
+
+CMD ["bash", "tests/integration/run_all.sh"]
