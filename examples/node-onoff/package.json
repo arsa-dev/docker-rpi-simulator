@@ -1,0 +1,13 @@
+{
+  "name": "gpio-sim-example-onoff",
+  "version": "1.0.0",
+  "description": "Blink an LED and read a button with onoff, against the sysfs GPIO simulator",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "start": "node blink-button.js"
+  },
+  "dependencies": {
+    "onoff": "^6.0.3"
+  }
+}
